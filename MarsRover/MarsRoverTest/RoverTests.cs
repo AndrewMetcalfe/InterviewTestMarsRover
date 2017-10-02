@@ -5,7 +5,7 @@ using MarsRover;
 namespace MarsRoverTest
 {
     [TestFixture()]
-    public class Test
+    public class RoverTests
     {
         [Test()]
 		public void GivenExampleTest()
@@ -35,7 +35,6 @@ namespace MarsRoverTest
 			Assert.AreEqual("9901 South", result);
 		}
 
-		[Ignore]
 		[Test()]
 		public void OutOfBoundsEastTest()
 		{
@@ -50,7 +49,6 @@ namespace MarsRoverTest
 			Assert.AreEqual("100 East", result);
 		}
 
-		[Ignore]
 		[Test()]
 		public void OutOfBoundsWestTest()
 		{
@@ -64,8 +62,7 @@ namespace MarsRoverTest
 			// Assert
 			Assert.AreEqual("1 West", result);
 		}
-
-		[Ignore]
+		
 		[Test()]
 		public void OutOfBoundsNorthTest()
 		{
@@ -79,6 +76,21 @@ namespace MarsRoverTest
 			// Assert
 			Assert.AreEqual("1 North", result);
 		}
+
+		[Test()]
+		public void OutOfBoundsNorthTest2()
+		{
+			// Arrange 
+			var m = new RoverClass();
+			var commands = "20m,Left,20m,Left,66m".Split(new char[] { ',' });
+
+			// Act
+			var result = m.Movement(commands);
+
+			// Assert
+			Assert.AreEqual("21 North", result);
+		}
+
 
 		[Test()]
 		public void InvalidCommandTooManyCommandsTest()

@@ -10,8 +10,24 @@ namespace MarsRover
 		{
 		}
 
-        const int gridMaxX = 100;
+        private GridClass grid = new GridClass();
+
+		const int maxCommandCount = 5;
+
+		// we need a X and Y co-ordinates to map to the gridref strings that the rover sends back
+		// row 1 starts at x:1,y:1 (gridRef: 1)         ...and ends at x:100,y:1 (gridRef: 100)
+		// row 2 starts at x:1,y2 (gridRef: 101)        ...and ends at x:100,y2 (gridRef: 200)
+		// row 100 starts at x:100,y:1 (gridRef: 9901)  ...and ends at x:100,y:100 (gridRef: 10000)
+
+		const int gridMinX = 1;
+		const int gridMaxX = 100;
+
+		const int gridMinY = 1;
         const int gridMaxY = 100;
+
+        // in ExecuteDistanceCommand(command) I've maniplating the grid string in a clunky way.
+        // It would probably be neater to convert the grid ref string into an X,Y coordinate 
+        // and then do the movement and then convert the X,Y coordinate back to a gridref string. 
 		private int gridRef = 1;
 		private string direction = "South";
 
@@ -47,7 +63,7 @@ namespace MarsRover
 				}
 
                 commandsExecutedCount += 1;
-                if (commandsExecutedCount >= 5) break;
+                if (commandsExecutedCount >= maxCommandCount) break;
 			}
 			return location;
 		}
@@ -110,28 +126,71 @@ namespace MarsRover
 
 		private bool ExecuteDistanceCommand(string command)
 		{
-
+            bool exceutionComplete = false;
 			int distance = GetDistance(command);
-
+            int currentY = grid.GetY(gridRef.ToString());
+			int currentX = grid.GetX(gridRef.ToString());
+			
 			switch (direction)
 			{
 				case "South":
-                    var y = gridRef / gridMaxX;
+                    
+                    if ((currentY + distance) >= gridMaxY) 
+                    {                        
+                        // only move as far as the grid perimeter
+                        gridRef = grid.GetGridRefInt(currentX, gridMaxY);
+					} 
+                    else 
+                    {
+                        gridRef = grid.GetGridRefInt(currentX, currentY + distance);
+                        exceutionComplete =true;
+                    }                    
+					break;
 
-                    gridRef = gridRef + (100  * distance);
-					break;
 				case "East":
-					gridRef = gridRef + distance;
+                    					
+					if ((currentX + distance) >= gridMaxX)
+					{
+						// only move as far as the grid perimeter
+						gridRef = grid.GetGridRefInt(gridMaxX, currentY);
+					}
+					else
+					{
+                        gridRef = grid.GetGridRefInt( currentX + distance, currentY);
+						exceutionComplete = true;
+					}
 					break;
+
 				case "North":
-					gridRef = gridRef - (100 * distance);
+                    
+					if ((currentY - distance) <= gridMinY)
+					{
+                        // only move as far as the grid perimeter 
+                        gridRef = grid.GetGridRefInt(currentX, gridMinY); ;
+					}
+					else
+					{
+						gridRef = grid.GetGridRefInt(currentX, currentY - distance);
+						exceutionComplete = true;
+					}					
 					break;
+
 				case "West":
-					gridRef = gridRef - (distance);
-					break;
+                    
+					if ((currentX - distance) <= gridMinX)
+					{
+						// only move as far as the grid perimeter 
+                        gridRef = grid.GetGridRefInt(gridMinX, currentY );
+					}
+					else
+					{
+						gridRef = grid.GetGridRefInt(currentX - distance, currentY);
+						exceutionComplete = true;
+					}
+					break;				
 			}
 
-			return true;
+			return exceutionComplete;
 		}
 
 		private int GetDistance(string command)

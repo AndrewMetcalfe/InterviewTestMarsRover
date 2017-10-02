@@ -31,7 +31,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Compile Include="RoverTests.cs" />
+    <Compile Include="GridTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
